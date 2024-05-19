@@ -1,3 +1,4 @@
+import 'package:app_webview/resources/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -9,9 +10,14 @@ class WebViewApp extends StatefulWidget {
 }
 
 class _WebViewAppState extends State<WebViewApp> {
-  late final WebViewController webViewController;
+  final webViewController = WebViewController();
   int loadingPercentage = 0;
-  late int index;
+  int? index = 1;
+  Map<int, String> urls = {
+    0: Strings.webNotices,
+    1: Strings.webRS,
+    2: Strings.webFootball
+  };
 
   @override
   void initState() {
@@ -21,53 +27,53 @@ class _WebViewAppState extends State<WebViewApp> {
       // Use o índice recebido aqui após a construção do widget
       index = ModalRoute.of(context)!.settings.arguments as int;
 
-    webViewController = WebViewController()
-      ..setNavigationDelegate(NavigationDelegate(
-        onPageStarted: (url) {
-          debugPrint("Página Iniciada URL : $url");
-          setState(() {
-            loadingPercentage = 0;
-          });
-        },
-        onProgress: (progress) {
-          debugPrint("Página em Progresso : $progress");
-          setState(() {
-            loadingPercentage = progress;
-          });
-        },
-        onPageFinished: (url) {
-          debugPrint("Página Carregada : $url");
-          setState(() {
-            loadingPercentage = 100;
-          });
-        },
-        onNavigationRequest: (navigationRequest) {
-          // WebView provides your app with a NavigationDelegate, which enables your app to track and control the page navigation of the WebView widget. When a navigation is initiated by the WebView, for example when a user clicks on a link, the NavigationDelegate is called. The NavigationDelegate callback can be used to control whether the WebView proceeds with the navigation.
-          final String host = Uri.parse(navigationRequest.url).host;
-          //  This code is used to prevent the user to navigate to the youtube .
-          if (host.contains("youtube.com")) {
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Navigation to $host is blocked")));
-            // The navigation decision is the enum in which we have to call it's constant value of the name prevent which is used to Prevent the navigation from taking place.
+      // inicia as URL
+      String selectedUrl = urls[index] ?? Strings.webNotices;
 
-            return NavigationDecision.prevent;
-          } else {
-            // Allow the navigation to take place.
+      //webView
+      webViewController
+      //O navigationRequest é a parte que podemos rastrear o que nosso usuário está fazendo nas navegações do APP
+        ..setNavigationDelegate(NavigationDelegate(
+          onPageStarted: (url) {
+            debugPrint("Página Iniciada URL : $url");
+            setState(() {
+              loadingPercentage = 0;
+            });
+          },
+          onProgress: (progress) {
+            debugPrint("Página em Progresso : $progress");
+            setState(() {
+              loadingPercentage = progress;
+            });
+          },
+          onPageFinished: (url) {
+            debugPrint("Página Carregada : $url");
+            setState(() {
+              loadingPercentage = 100;
+            });
+          },
+          onNavigationRequest: (navigationRequest) {
+            final String host = Uri.parse(navigationRequest.url).host;
+            //Podemos proibir de nosso usuário acessar um site específico
+            if (host.contains("https://chatgpt.com/")) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("A navegação para $host está bloqueada")));
 
-            return NavigationDecision.navigate;
-          }
-        },
-      ))
+              return NavigationDecision.prevent;
+            } else {
+              // Navegação permitida
 
-      // The load request method of the web view flutter is used to makes a specific HTTP request and loads the response in the webview.
-      ..loadRequest(
-        // Makes a specific HTTP request and loads the response in the webview.
-        Uri.parse(index == 1
-            ? 'https://g1.globo.com/'
-            : index == 2
-                ? 'https://emergencia.paraquemdoar.com.br/?ref=home_banner?utm_source=pirulito&utm_medium=home&utm_campaign=homeg1'
-                : 'https://ge.globo.com/'),
-      );
+              return NavigationDecision.navigate;
+            }
+          },
+        ))
+
+        // Solicitação de carregamento do flutter da visualização da web é usado para fazer
+        // uma solicitação HTTP específica e carregar a resposta na visualização da web
+        ..loadRequest(
+          // Url
+          Uri.parse(selectedUrl),
+        );
     });
   }
 

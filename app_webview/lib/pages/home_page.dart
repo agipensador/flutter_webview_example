@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
             children: List.generate(
               buttonDataList.length,
               (index) => Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: OutlineButtonWidget(
                   buttonData: buttonDataList[index],
                   index: index,
