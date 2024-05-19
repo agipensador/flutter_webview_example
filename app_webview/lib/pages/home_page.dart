@@ -24,6 +24,7 @@ class HomePage extends StatelessWidget {
                 child: OutlineButtonWidget(
                   buttonData: buttonDataList[index],
                   index: index,
+                  color: buttonDataList[index].color,
                 ),
               ),
             ),
@@ -45,7 +46,7 @@ class ButtonData {
   }
 
   factory ButtonData.helpRS() {
-    return ButtonData(text: 'Ajude o RS', color: Colors.purple);
+    return ButtonData(text: 'Ajude o RS', color: Colors.purple.shade700);
   }
 
   factory ButtonData.football() {
@@ -56,8 +57,10 @@ class ButtonData {
 class OutlineButtonWidget extends StatelessWidget {
   final ButtonData buttonData;
   final int index;
+  final Color color;
 
-  OutlineButtonWidget({required this.buttonData, required this.index});
+  OutlineButtonWidget(
+      {required this.buttonData, required this.index, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +72,7 @@ class OutlineButtonWidget extends StatelessWidget {
                 Navigator.pushNamed(
                   context,
                   'webView',
-                  arguments: index,
+                  arguments: {'index': index, 'color': color},
                 );
               },
               style: ButtonStyle(
@@ -78,8 +81,14 @@ class OutlineButtonWidget extends StatelessWidget {
                     MaterialStateProperty.all(buttonData.color.withOpacity(.2)),
                 shape: MaterialStateProperty.all(
                   RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0)),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
                 ),
+                side: MaterialStateProperty.resolveWith((states) {
+                  return BorderSide(
+                      color: buttonData
+                          .color); // Defina a cor da borda quando o botão estiver em seu estado padrão
+                }),
               ),
               child: Text(buttonData.text)),
         ),

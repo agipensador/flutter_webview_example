@@ -13,6 +13,7 @@ class _WebViewAppState extends State<WebViewApp> {
   final webViewController = WebViewController();
   int loadingPercentage = 0;
   int? index = 1;
+  Color? colored;
   Map<int, String> urls = {
     0: Strings.webNotices,
     1: Strings.webRS,
@@ -25,14 +26,16 @@ class _WebViewAppState extends State<WebViewApp> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Use o índice recebido aqui após a construção do widget
-      index = ModalRoute.of(context)!.settings.arguments as int;
-
+      final Map<String, dynamic> args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      index = args['index'];
+      colored = args['color'];
       // inicia as URL
       String selectedUrl = urls[index] ?? Strings.webNotices;
 
       //webView
       webViewController
-      //O navigationRequest é a parte que podemos rastrear o que nosso usuário está fazendo nas navegações do APP
+        //O navigationRequest é a parte que podemos rastrear o que nosso usuário está fazendo nas navegações do APP
         ..setNavigationDelegate(NavigationDelegate(
           onPageStarted: (url) {
             debugPrint("Página Iniciada URL : $url");
@@ -56,8 +59,8 @@ class _WebViewAppState extends State<WebViewApp> {
             final String host = Uri.parse(navigationRequest.url).host;
             //Podemos proibir de nosso usuário acessar um site específico
             if (host.contains("https://chatgpt.com/")) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("A navegação para $host está bloqueada")));
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("A navegação para $host está bloqueada")));
 
               return NavigationDecision.prevent;
             } else {
@@ -79,33 +82,47 @@ class _WebViewAppState extends State<WebViewApp> {
 
   @override
   Widget build(BuildContext context) {
+    final coloredIcon = colored != null ? Colors.white : Colors.black87;
+
     return Scaffold(
+      bottomNavigationBar: BottomAppBar(
+        color: colored,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(Icons.home, color: coloredIcon),
+            ),
+            Row(
+              children: [
+                customIconButton(() async {
+                  if (await webViewController.canGoBack()) {
+                    await webViewController.goBack();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Não há páginas para voltar")));
+                  }
+                }, Icons.arrow_back, coloredIcon),
+                customIconButton(() async {
+                  if (await webViewController.canGoForward()) {
+                    await webViewController.goForward();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Não há páginas para avançar")));
+                  }
+                }, Icons.arrow_forward, coloredIcon),
+                customIconButton(() => webViewController.reload(),
+                    Icons.refresh_rounded, coloredIcon)
+              ],
+            )
+          ],
+        ),
+      ),
       appBar: AppBar(
         title: const Text('Flutter WebView'),
         centerTitle: true,
-        leading: IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.home)),
-        actions: [
-          customIconButton(() async {
-            if (await webViewController.canGoBack()) {
-              await webViewController.goBack();
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Não há páginas para voltar")));
-            }
-          }, Icons.arrow_back),
-          customIconButton(() async {
-            if (await webViewController.canGoForward()) {
-              await webViewController.goForward();
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Não há páginas para avançar")));
-            }
-          }, Icons.arrow_forward),
-          customIconButton(
-              () => webViewController.reload(), Icons.refresh_rounded)
-        ],
+        automaticallyImplyLeading: false,
       ),
       body: Stack(
         children: [
@@ -128,20 +145,24 @@ class _WebViewAppState extends State<WebViewApp> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black54,
         onPressed: () async {
           //Requisição para o webview
           await webViewController
               .loadRequest(Uri.parse('https://github.com/agipensador'));
         },
-        child: const Text("GIT"),
+        child: const Text(
+          "GIT",
+          style: TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
 
-  Widget customIconButton(Function function, IconData icon) {
+  Widget customIconButton(Function function, IconData icon, Color coloredIcon) {
     return IconButton(
       onPressed: () => function(),
-      icon: Icon(icon),
+      icon: Icon(icon, color: coloredIcon),
     );
   }
 }
