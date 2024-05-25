@@ -1,4 +1,4 @@
-import 'package:app_webview/resources/strings.dart';
+import 'package:app_webview/core/resources/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -74,13 +74,6 @@ class WebViewPageController extends GetxController {
     coloredIcon?.value = colored?.value != null ? Colors.white : Colors.black87;
 
     super.onInit();
-  }
-
-  Widget customIconButton(Function function, IconData icon, Color coloredIcon) {
-    return IconButton(
-      onPressed: () => function(),
-      icon: Icon(icon, color: coloredIcon),
-    );
   }
 
   Future<void> onShowUserAgent() {

@@ -1,4 +1,4 @@
-import 'package:app_webview/ViewModel/home_controller_page.dart';
+import 'package:app_webview/core/presentation/viewmodels/home_controller_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
