@@ -18,7 +18,6 @@ class WebViewPageController extends GetxController {
 
   @override
   void onInit() {
-    webViewController;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Use o índice recebido aqui após a construção do widget
       final args = Get.arguments;
@@ -47,14 +46,10 @@ class WebViewPageController extends GetxController {
             final String host = Uri.parse(navigationRequest.url).host;
             //Podemos proibir de nosso usuário acessar um site específico
             if (host.contains("https://chatgpt.com/")) {
-              GetSnackBar(
-                  message: "A navegação para $host está bloqueada",
-                  duration: const Duration(seconds: 5));
-
+              defaultGetSnackbar(message: "A navegação para $host está bloqueada");
               return NavigationDecision.prevent;
             } else {
               // Navegação permitida
-
               return NavigationDecision.navigate;
             }
           },
@@ -64,10 +59,7 @@ class WebViewPageController extends GetxController {
         ..addJavaScriptChannel(
           'Toaster',
           onMessageReceived: (JavaScriptMessage message) {
-            GetSnackBar(
-              message: message.message.toString(),
-              duration: const Duration(seconds: 5),
-            );
+           defaultGetSnackbar(message: message.message.toString().replaceAll('/', '\n'));
           },
         )
 
@@ -92,10 +84,21 @@ class WebViewPageController extends GetxController {
   }
 
   Future<void> onShowUserAgent() {
-    // Send a message with the user agent string to the Toaster JavaScript channel we registered
-    // with the WebView.
+    // Exibe um toast com o Agent, do javascript. Buscando infos do celular do usuário(navegador, celular...)
     return webViewController.runJavaScript(
       'Toaster.postMessage("User Agent: " + navigator.userAgent);',
+    );
+  }
+
+  SnackbarController defaultGetSnackbar({required String message, SnackPosition? position = SnackPosition.TOP}){
+    return  Get.snackbar(
+      'Info:',
+      message,
+      duration: const Duration(seconds: 5),
+      backgroundColor: Colors.white,
+      borderColor: colored?.value ?? Colors.black54,
+      borderWidth: 2,
+      snackPosition: position
     );
   }
 }
