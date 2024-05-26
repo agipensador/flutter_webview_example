@@ -65,7 +65,7 @@ class WebViewPage extends StatelessWidget {
           ),
         ),
         appBar: AppBar(
-          title: const Text('Flutter WebView'),
+          title: const Text('Flutter WebView',),
           centerTitle: true,
           automaticallyImplyLeading: false,
         ),

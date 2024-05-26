@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HomeControllerPage extends GetxController {
-
   final List<ButtonData> buttonDataList = [
     ButtonData.news(),
     ButtonData.helpRS(),

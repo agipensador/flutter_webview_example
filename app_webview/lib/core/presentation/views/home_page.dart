@@ -52,6 +52,7 @@ class OutlineButtonWidget extends StatelessWidget {
       children: [
         Expanded(
           child: OutlinedButton(
+            key: const Key('btnWeb'),
             onPressed: () {
               Get.toNamed(
                 '/webView',
