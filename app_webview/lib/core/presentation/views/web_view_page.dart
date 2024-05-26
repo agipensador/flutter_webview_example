@@ -65,14 +65,13 @@ class WebViewPage extends StatelessWidget {
           ),
         ),
         appBar: AppBar(
-          title: const Text('Flutter WebView',),
+          title: const Text('Flutter WebView'),
           centerTitle: true,
           automaticallyImplyLeading: false,
         ),
         body: Stack(
           children: [
             WebViewWidget(
-              //Controlador
               controller: controller.webViewController,
             ),
             if (controller.loadingPercentage.value < 100)
